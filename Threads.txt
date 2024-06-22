@@ -1,0 +1,84 @@
+*Threads
+-Khi nào nên sử dụng threads
+->nếu như bạn muốn có nhiều tác vụ muốn làm việc đồng thời với nhau, thì hãy sử dụng các Thread
+->bạn mong muốn được điều khiển các Luồng theo một sự đồng bộ nhất định. Chẳng hạn bạn khởi động nhiều Thread trong một ứng dụng, nhưng bạn muốn các Thread khác tuy được khởi động nhưng khoan hãy chạy, mà phải đợi một Thread nào đó kết thúc thì mới được hoạt động
+-> cũng không ngoài việc muốn xử lý các tác vụ đồng thời, nhưng khi này là tình huống khi bạn muốn ứng dụng thực thi các tác vụ quá lớn,Khi đó nếu không có Thread, các tác vụ lâu lắc này có thể sẽ làm ảnh hưởng nghiêm trọng đến trải nghiệm của người dùng.
+
+*SYNCHRONIZED
+-khi nào nên sử dụng đồng bộ hóa : đồng bộ hóa điều chỉnh sao cho cùng 1 thời điểm chỉ có 1 threads được truy cập đến 1 tài nguyên dùng chung nào đó.Vậy khi nào mới cần đến sự điều chỉnh này? 
+->Chỉ những tài nguyên nào có sự tranh chấp, có sự dùng chung giữa các Thread với nhau, dẫn đến nguy cơ có Thread này đang chỉnh sửa giá trị của đối tượng, đồng thời Thread khác cũng thực hiện việc chỉnh sửa lên đối tượng này, dẫn đến các “hiểu lầm” không cần thiết ở các Thread, có thể sẽ gây ra các tai nạn ở runtime,… thì mới dùng đến Đồng bộ hoá mà thôi.
+
+-Các cách thức đồng bộ hóa:
++>: Cách thứ nhất được gọi là Mutual Exclusive(Loại trừ lẫn nhau) : Cách này hệ thống sẽ ưu tiên 1 Threads, ngăn chặn các Threads khác , khỏi nguy cơ xung đột lẫn nhau.
+->Chúng ta biết rằng cơ chế để hệ thống đồng bộ hóa được gọi là Monitor Lock
+->Bạn có thể hiểu rằng SYNCHRONIZED có thể được khai báo ở cấp độ (phương thức trong lớp) hoặc ở cấp độ (khối lệnh) bên trong phương thức.
+VD:Khi bạn khai báo một phương thức, nếu muốn đồng bộ hóa trên phương thức này, hãy thêm vào từ khóa synchronized như code minh họa sau.
+
+                                     public synchronized void withdraw() {
+                                         // Nội dung phương thức
+                                         // ...
+                                         }
+
+-> khi bạn đặt từ khóa synchronized vào một hoặc nhiều phương thức bên trong lớp. Thì đối tượng của lớp đó sẽ được Monitor quản lý, một khi có một Thread đăng ký sử dụng đến một trong các phương thức có từ khóa synchronized, Monitor đó cấp Lock cho Thread đó cho đến khi nó hoàn thành xong các phương thức đó.
+
+VD:Vậy có những lúc bạn không cần phải xin Lock cho toàn bộ phương thức. Nếu bạn chỉ cần một phần trong phương thức đó được bảo hộ bởi Monitor thôi. Thì hãy áp dụng cách thức synchronized cho khối lệnh của mục này.
+
+Bạn có thể tham khảo cú pháp của việc synchronized đến khối lệnh bên trong phương thức như sau.
+
+                                     synchronized (đối_tượng) {
+                                         // Nội dung của khối lệnh
+                                         }
+
++>: Cách thứ hai được gọi là Cooperation(cộng tác với nhau) : Cách này bản thân các Threads sẽ bắt tay với nhau , cùng nhau điều tiết sự ưu tiên để bản thân chúng tránh khỏi xung đột.
+->wait():
+->notify():
+->nitifyAll():
+
+*THREADS POOL
+-Threads Pool (hoặc ThreadPool) là một cấu trúc trong lập trình đa luồng được sử dụng để quản lý và duy trì một nhóm các luồng (threads) sẵn sàng để xử lý các công việc (tasks) mà cần được thực thi. Thay vì tạo mới luồng mỗi khi cần xử lý một công việc, ThreadPool sử dụng và tái sử dụng các luồng sẵn có trong pool, giúp tăng hiệu suất và giảm tải cho hệ thống.
+
+-Các ưu điểm của ThreadPool bao gồm:
+->Tiết kiệm tài nguyên: Giảm overhead do tạo và hủy luồng liên tục.
+->Quản lý tài nguyên tốt hơn: Giới hạn số luồng duy trì trong pool giúp tránh quá tải hệ thống.
+->Tăng hiệu suất: Thực thi các công việc một cách song song giữa các luồng có sẵn trong pool.
+->Kiểm soát và theo dõi dễ dàng: Dễ dàng quản lý số lượng luồng, khả năng monitor và gỡ lỗi.
+
+-Bạn nên sử dụng ThreadPool trong các trường hợp sau:
+
+->Ứng dụng cần xử lý nhiều tác vụ đồng thời: Khi ứng dụng của bạn phải xử lý nhiều công việc mà có thể thực hiện song song một cách hiệu quả, sử dụng ThreadPool giúp tận dụng tối đa tài nguyên hệ thống.
+->Giảm thời gian tạo và hủy luồng: Việc tạo mới luồng mất thời gian và tạo nên overhead. ThreadPool giúp giảm thời gian này bằng cách duy trì một pool các luồng đã sẵn sàng.
+->Giảm tải cho hệ thống: Bằng cách giới hạn số luồng trong pool, bạn có thể kiểm soát tải cho hệ thống, tránh quá tải và tăng hiệu sất.
+->Yêu cầu quản lý linh hoạt về các công việc đến và đi: ThreadPool cung cấp khả năng quản lý và theo dõi các công việc được thực hiện thông qua các giao diện như ExecutorService, Future và các phương thức khác.
+->Ứng dụng cần hoạt động ổn định trong thời gian dài: Việc sử dụng ThreadPool giúp ổn định hệ thống, tránh tạo ra quá nhiều luồng vào thời điểm cần thiết.
+
+-Làm Quen Với ThreadPoolExecutor
+->Lớp này đã xây dựng sẵn cho bạn một hàng đợi có tên là Task Queue, và một Pool trong đó. Khi bạn có quá nhiều Thread (chính là các Runnable trong Application như hình dưới), thì thay vì cứ start chúng thành các Thread, bạn cứ “quăng” tất cả Runnable vào trong ThreadPoolExecutor đã khai báo. Tất cả các Runnable này sau đó được ThreadPoolExecutor để vào trong Task Queue. Và sẽ chỉ lấy ra đủ số lượng Runnable mà bạn đã chỉ định, để thực thi chúng thành các Thread. Dễ dàng thôi đúng không.
+
+-Sử dụng Thread Pool thông qua bộ ba tiện ích: Executors, Executor và ExecutorService.
+
+-Làm Quen Với Executors (*)
+->Tại sao chúng ta lại phải sử dụng Runnable? Vì Thread Pool chỉ nhận các Runnable truyền vào (và Callable nữa mà bạn sẽ làm quen sau, nhưng Callable cũng giống Runnable mà thôi)
+->executorService.execute(myRunnable) giúp lần lượt đưa các Runnable được khởi tạo vào trong Thread Pool và lần lượt thực thi sau đó.
+->newSingleThreadExecutor(): Giúp tạo ra một Thread Pool có khả năng thực thi 1 Thread trong đó.
+->newCachedThreadPool(): hệ thống sẽ tự quyết định số lượng Thread được thực thi trong Hồ.
+->newFixedThreadPool(int nThreads): Đây là Thread Pool thông dụng mà mình thấy. Phương thức này giúp tạo ra một Pool có thể chứa tối đa nThreads. Khi Pool đạt đến giá trị tối đa nThreads, các Thread còn lại sẽ được đưa vào hàng đợi và chờ đến khi có Thread trong Pool được xử lý xong mới được thực thi tiếp.
+
+-Làm Quen Với Executor Và ExecutorService(*)
+->Executor và ExecutorService là một.
+-> ExecutorService : vì nó vừa bao gồm phương thức execute(Runnable) của Executor, vừa xây dựng thêm nhiều phương thức hữu ích khác nữa.
+->ExecutorService: Đó là nó giúp chúng ta đưa các Runnable vào bên trong Thread Pool thông qua phương thức execute(Runnable). Chính các Thread Pool sẽ quyết định thực thi các Runnable này theo kịch bản mà chúng được khai báo.
+-Sau đây là tất cả các phương thức mà ExecutorService cung cấp.
+->execute(Runnable):được xem như việc đưa các Runnable vào Thread Pool và khởi chạy chúng theo kiểu bất đồng bộ. Đó là bạn sẽ không biết được khi nào các Runnable kết thúc, và các kết quả mà chúng trả về là gì.
+->submit(Runnable) và submit(Callable):  Phương thức submit() cho phép truyền vào hoặc là Runnable như cách bạn thực hành với execute() trên kia, hoặc là Callable.
++>Callable: Về cơ bản thì Callable cũng như Runnable, chúng cũng có khả năng tạo ra một Thread. Nhưng Callable thì lại cho phép Thread này trả kết quả về một cách đồng bộ, khi mà Runnable lại không làm được điều đó. 
+
+-Tìm Hiểu workQueue
+->SynchronousQueue: chúng không lưu trữ bất kỳ Runnable nào trên Queue cả, ngay khi chúng nhận được các Runnable, chúng sẽ tìm cách thực thi ngay các Runnable này. Queue này không thể chỉ định độ lớn, nó chứa đựng tối đa các Runnable đưa vào Pool.Tuy nhiên nếu như có nhiều Runnable vào Queue hơn số lượng có thể thực thi (thông qua các tham số corePoolSize và maximumPoolSize mà bạn đã biết), thì các Runnable chưa được start ngay sẽ bị hủy, và một RejectedExecutionException sẽ được tung ra
+->LinkedBlockingQueue: Được mệnh danh là Queue không giới hạn. Thường thì người ta dùng đến hàng đợi này mà không quá quan tâm đến sức chứa tối đa của nó
+
+
+*OOP
+-->Tính trừu tượng: Thực ra thì lớp Trừu tượng vẫn có tồn tại, vẫn là một lớp thôi. Nhưng nó trừu tượng ở chỗ, nó không thể được dùng để tạo ra các đối tượng như những lớp bình thường khác. Lớp Trừu tượng khi này chỉ là cái “xác không hồn”, hay bạn có thể hiểu nó chỉ là một cái sườn, để mà bạn có thể tạo ra các lớp con của nó dựa vào sự ràng buộc từ cái sườn này.
+
+
+
